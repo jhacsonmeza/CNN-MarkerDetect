@@ -1,7 +1,6 @@
 #include "utils.hpp"
 
 #include <cmath>
-#include <algorithm>
 #include <opencv2/opencv.hpp>
 
 void resize_im_bbox(cv::InputOutputArray _im, cv::InputOutputArray _target, cv::Size output_size)
@@ -200,51 +199,15 @@ void transformer(cv::InputOutputArray _im, cv::InputOutputArray _target, float p
         scale_im_bbox(_im, _target, scale);
     }
 
-    if (rng.uniform(0.f, 1.f) < p*10)
+    if (rng.uniform(0.f, 1.f) < p)
     {
-        float alpha = 1.f; //rng.uniform(0.5f, 1.5f)
-        float beta = 0.f; //rng.uniform(0.f, 10.f)
+        float alpha = 1.f;
+        float beta = 0.f;
         float gamma = rng.uniform(0.2f, 2.f);
 
         contrast_brightness(_im, alpha, beta, gamma);
     }
 }
-
-// float iou_bbox(const float* pbbox1, const float* pbbox2, const int64_t* sz)
-// {
-//     int n = sz[0]; //Batch size
-//     float metric = 0.f;
-//     for (int i = 0; i < n; i++)
-//     {
-//         // Scale bounding boxes
-//         float xc1 = pbbox1[i*4]*sz[3];
-//         float yc1 = pbbox1[i*4+1]*sz[2];
-//         float w1 = pbbox1[i*4+2]*sz[3];
-//         float h1 = pbbox1[i*4+3]*sz[2];
-
-//         float xc2 = pbbox2[i*4]*sz[3];
-//         float yc2 = pbbox2[i*4+1]*sz[2];
-//         float w2 = pbbox2[i*4+2]*sz[3];
-//         float h2 = pbbox2[i*4+3]*sz[2];
-
-//         // Estimate top-lef point
-//         float x1 = std::max(xc1-w1/2, xc2-w2/2);
-//         float y1 = std::max(yc1-h1/2, yc2-h2/2);
-
-//         // Estimate bottom-right point
-//         float x2 = std::min(xc1+w1/2, xc2+w2/2);
-//         float y2 = std::min(yc1+h1/2, yc2+h2/2);
-
-//         // Estimate area of intersection and area of union
-//         float area_inter = std::max(0.f, x2-x1)*std::max(0.f, y2-y1);
-//         float area_union = w1*h1 + w2*h2 - area_inter;
-
-//         // Estimate IoU and add to metric
-//         metric += area_inter/area_union;
-//     }
-
-//     return metric;
-// }
 
 float iou_bbox(const float* pbbox1, const float* pbbox2, const int64_t* sz)
 {
