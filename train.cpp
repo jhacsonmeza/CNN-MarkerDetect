@@ -13,7 +13,12 @@
 #include <opencv2/opencv.hpp>
 
 #include "utils.hpp"
+
+#if __has_include(<torchvision/vision.h>)
+#include <torchvision/vision.h>
+#else
 #include "model/resnet.h"
+#endif
 
 using Data = std::vector<std::pair<std::string, std::vector<float>>>;
 
@@ -74,7 +79,6 @@ int main()
     {
         std::cout << "CUDA is available. Training on GPU..." << std::endl;
         device = torch::kCUDA;
-        // auto device = torch::Device(torch::kCUDA, 0);
     }
     else
     {
@@ -84,7 +88,7 @@ int main()
 
 
     // Load csv data
-    std::ifstream file("data_bbox.csv"); // Stream to the input csv file
+    std::ifstream file("../data_bbox.csv"); // Stream to the input csv file
 
     // Read first line and ignore (title)
     std::string line;
@@ -142,11 +146,10 @@ int main()
 
     // Create the model
     auto model = vision::models::ResNet18();
-    torch::load(model,"resnet18.pt"); // Load ImageNet pretrained weights
+    torch::load(model,"../resnet18.pt", device); // Load ImageNet pretrained weights
     model->fc = model->replace_module("fc", torch::nn::Linear(512, 4));
     for (auto& v: model->parameters())
 		v.set_requires_grad(true);
-    torch::load(model, "bbox++.pt");
     model->to(device);
 
     // Defining the loss function
@@ -231,7 +234,7 @@ int main()
         if (val_loss < val_loss_min)
         {
             std::cout << "Validation loss decreased (" << val_loss_min << " --> " << val_loss << "). Saving model..." << std::endl;
-            torch::save(model, "weights.pt");
+            torch::save(model, "../weights.pt");
 
             val_loss_min = val_loss;
             count_lr = 0; // Reset counter
@@ -242,7 +245,7 @@ int main()
             options.lr(current_lr*factor);
 
             std::cout << "Loading best model weights" <<  std::endl;
-            torch::load(model, "weights.pt");
+            torch::load(model, "../weights.pt");
 
             count_lr = 0; // Reset counter
         }
