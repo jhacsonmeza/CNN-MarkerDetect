@@ -5,8 +5,8 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(OpenCV REQUIRED)
-find_package(Torch REQUIRED HINTS)
-find_package(TorchVision QUIET HINTS)
+find_package(Torch REQUIRED)
+find_package(TorchVision QUIET)
 
 if(TorchVision_FOUND)
 	add_executable(train train.cpp utils.cpp)
